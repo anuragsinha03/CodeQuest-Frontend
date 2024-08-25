@@ -1,0 +1,4 @@
+back = #17153B
+light1 = #2E236C
+light2 = #433D8B
+front = #C8ACD6
