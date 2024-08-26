@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import DOMPurify from "dompurify";
+import io from "socket.io-client";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import AceEditor from "react-ace";
@@ -10,17 +10,48 @@ import Themes from "./../constants/Themes";
 import "./../imports/AceBuildImports";
 import { useParams } from "react-router-dom";
 
+const socketServerURL = "http://localhost:3005";
+
 function Problem() {
 	const { problemId } = useParams();
-
-	//const sanitizedMarkdown = DOMPurify.sanitize(descriptionText);
-
 	const [code, setCode] = useState("");
 	const [language, setLanguage] = useState("java");
 	const [theme, setTheme] = useState("monokai");
 	const [inputConsole, setInputConsole] = useState(false);
+	const [status, setStatus] = useState("");
+	const [output, setOutput] = useState("Run the code to get the output");
+	const [testCases, setTestCases] = useState([]);
 	const [problemTitle, setProblemTitle] = useState("");
 	const [problemDescription, setProblemDescription] = useState("");
+	const [socket, setSocket] = useState(null);
+	// eslint-disable-next-line no-unused-vars
+	const [connectionId, setConnectionId] = useState("");
+	const userId = "1"; // Replace with actual user ID as needed
+
+	useEffect(() => {
+		const newSocket = io(socketServerURL, { transports: ["websocket"] });
+
+		newSocket.on("connect", () => {
+			console.log("Connected to the server with id: ", newSocket.id);
+			setSocket(newSocket);
+			newSocket.emit("setUserId", userId);
+		});
+
+		newSocket.on("connectionId", id => {
+			console.log("Received connectionId from server:", id);
+			setConnectionId(id);
+		});
+
+		newSocket.on("submissionPayloadResponse", payload => {
+			console.log("Received payload from server:", payload);
+			setStatus(payload.response.status);
+			setOutput(payload.response.output);
+		});
+
+		return () => {
+			newSocket.disconnect();
+		};
+	}, []);
 
 	useEffect(() => {
 		async function fetchProblem() {
@@ -32,6 +63,7 @@ function Problem() {
 				setCode(response.data.data.codeStubs[0].userSnippet);
 				setProblemTitle(response.data.data.title);
 				setProblemDescription(response.data.data.description);
+				setTestCases(response.data.data.testCases);
 			} catch (error) {
 				console.error("Error fetching problem data:", error);
 			}
@@ -41,23 +73,33 @@ function Problem() {
 	}, [problemId]);
 
 	async function handleSubmission() {
+		if (!socket.id) {
+			console.error(
+				"No connection ID. Ensure you are connected to the server."
+			);
+			return;
+		}
+
 		try {
-			console.log(code);
-			console.log(language);
+			console.log("Submitting code:", code);
+			console.log("Using language:", language);
+
 			const response = await axios.post(
 				"http://localhost:3000/api/v1/submissions",
 				{
 					code,
 					language,
-					userId: "1",
-					problemId: problemId,
-					// problemId: "66bf607ab427c4f285104958",
+					userId: "1", // Use the same userId that was sent during socket connection
+					problemId,
 				}
 			);
-			console.log(response);
-			return response;
+
+			setStatus("Pending...");
+			setOutput("");
+			console.log("Submission response:", response.data);
+			// The server will emit the submissionPayloadResponse event when the submission is processed
 		} catch (error) {
-			console.log(error);
+			console.error("Error during submission:", error);
 		}
 	}
 
@@ -73,16 +115,37 @@ function Problem() {
 							{problemTitle.toUpperCase()}
 						</ReactMarkdown>
 					</div>
-					<div className='md:h-[100vh] md:overflow-y-auto'>
-						<div className='font-semibold'>Problem Statement</div>
-						<ReactMarkdown
-							rehypePlugins={[rehypeRaw]}
-							className='prose'>
-							{problemDescription}
-						</ReactMarkdown>
+					<div className='flex flex-col gap-[2rem] md:h-[100vh] md:overflow-y-auto'>
+						<div>
+							{" "}
+							<div className='font-semibold'>
+								Problem Statement
+							</div>
+							<ReactMarkdown
+								rehypePlugins={[rehypeRaw]}
+								className='prose'>
+								{problemDescription}
+							</ReactMarkdown>
+						</div>
+
+						<div>
+							<div className='font-semibold'>Test Cases:</div>
+							{testCases.map((tc, index) => (
+								<div
+									key={index}
+									className='mb-4'>
+									<div>
+										<strong>Input:</strong> {tc.input}
+									</div>
+									<div>
+										<strong>Output:</strong> {tc.output}
+									</div>
+								</div>
+							))}
+						</div>
 					</div>
 				</section>
-				<section className='flex flex-col gap-2 text-black'>
+				<section className='flex flex-col gap-2 text-black md:max-w-[60vw]'>
 					<div className='flex gap-[1rem]'>
 						<select
 							className='bg-[#433D8B] text-white p-2'
@@ -167,11 +230,27 @@ function Problem() {
 								name=''
 								id=''
 								placeholder='write custom input...'
-								className='font-semibold p-[1rem] placeholder-black  text-black bg-[#C8ACD6] min-w-[82vw] min-h-[15vh] md:min-w-[50vw] md:min-h-[20vh]'
+								className='font-semibold p-[1rem] bg-[#1E1C43] min-w-[82vw] min-h-[15vh] md:min-w-[50vw] md:min-h-[20vh]'
 							/>
 						) : (
-							<div className='font-semibold p-[1rem] text-black bg-[#C8ACD6] min-w-[82vw] min-h-[15vh] md:min-w-[40vw] md:min-h-[20vh]'>
-								Run the code to get the output
+							<div className='font-semibold p-[1rem] bg-[#1E1C43]  min-w-[82vw] min-h-[15vh] md:min-w-[40vw] md:min-h-[20vh]'>
+								{testCases.length > 0 && (
+									<div>INPUT: {testCases[0].input}</div>
+								)}
+
+								<div>{output}</div>
+								<div
+									className={`${
+										status === "Pending..."
+											? "text-white"
+											: ""
+									} ${
+										status === "SUCCESS"
+											? "text-green-500"
+											: "text-red-500"
+									}`}>
+									{status}
+								</div>
 							</div>
 						)}
 					</div>

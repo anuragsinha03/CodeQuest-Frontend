@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 function Navbar() {
 	return (
-		<nav className='font-bold text-center text-white text-2xl py-[1rem]'>
+		<nav className='flex items-center justify-center font-bold text-white text-2xl h-[10vh]'>
 			<Link to='/'>CodeQuest</Link>
 		</nav>
 	);
