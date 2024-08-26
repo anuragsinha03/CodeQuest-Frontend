@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Problem from "./pages/Problem";
 import SampleProblem from "./constants/SampleProblem";
+import ProblemsCatalogue from "./pages/ProblemsCatalogue";
 
 function App() {
 	const markdownText = SampleProblem.problemStatement;
@@ -21,7 +22,10 @@ function App() {
 					path='/signup'
 					element={<Signup />}></Route>
 				<Route
-					path='/problem'
+					path='/problems'
+					element={<ProblemsCatalogue />}></Route>
+				<Route
+					path='/problems/:problemId'
 					element={
 						<Problem descriptionText={markdownText} />
 					}></Route>
