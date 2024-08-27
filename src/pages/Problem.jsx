@@ -8,11 +8,12 @@ import Navbar from "../components/general-components/Navbar";
 import Languages from "../constants/Languages";
 import Themes from "./../constants/Themes";
 import "./../imports/AceBuildImports";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const socketServerURL = "http://localhost:3005";
 
 function Problem() {
+	const navigate = useNavigate();
 	const { problemId } = useParams();
 	const [code, setCode] = useState("");
 	const [language, setLanguage] = useState("java");
@@ -32,25 +33,25 @@ function Problem() {
 		const newSocket = io(socketServerURL, { transports: ["websocket"] });
 
 		newSocket.on("connect", () => {
-			console.log("Connected to the server with id: ", newSocket.id);
+			// console.log("Connected to the server with id: ", newSocket.id);
 			setSocket(newSocket);
 			newSocket.emit("setUserId", userId);
 		});
 
 		newSocket.on("connectionId", id => {
-			console.log("Received connectionId from server:", id);
+			// console.log("Received connectionId from server:", id);
 			setConnectionId(id);
 		});
 
 		newSocket.on("submissionPayloadResponse", payload => {
-			console.log("Received payload from server:", payload);
+			// console.log("Received payload from server:", payload);
 			setStatus(payload.response.status);
 			setOutput(payload.response.output);
 		});
 
-		return () => {
-			newSocket.disconnect();
-		};
+		// return () => {
+		// 	newSocket.disconnect();
+		// };
 	}, []);
 
 	useEffect(() => {
@@ -84,6 +85,13 @@ function Problem() {
 			console.log("Submitting code:", code);
 			console.log("Using language:", language);
 
+			const token = localStorage.getItem("authToken");
+			if (!token) {
+				// console.log("Login before submitting");
+				navigate("/login");
+			}
+
+			// eslint-disable-next-line no-unused-vars
 			const response = await axios.post(
 				"http://localhost:3000/api/v1/submissions",
 				{
@@ -91,12 +99,17 @@ function Problem() {
 					language,
 					userId: "1", // Use the same userId that was sent during socket connection
 					problemId,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
 				}
 			);
 
 			setStatus("Pending...");
 			setOutput("");
-			console.log("Submission response:", response.data);
+			// console.log("Submission response:", response.data);
 			// The server will emit the submissionPayloadResponse event when the submission is processed
 		} catch (error) {
 			console.error("Error during submission:", error);
@@ -117,7 +130,6 @@ function Problem() {
 					</div>
 					<div className='flex flex-col gap-[2rem] md:h-[100vh] md:overflow-y-auto'>
 						<div>
-							{" "}
 							<div className='font-semibold'>
 								Problem Statement
 							</div>

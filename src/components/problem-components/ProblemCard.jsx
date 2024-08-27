@@ -12,15 +12,13 @@ function ProblemCard({ problem }) {
 	}
 
 	return (
-		<tr className='border-b-[1px]'>
-			<Link
-				to={`http://localhost:5173/problems/${problem._id}`}
-				className='flex justify-between rounded-lg py-[2px]'>
-				<div>{problem.title}</div>
-				<div className={`font-semibold ${difficultyClass}`}>
-					{problem.difficulty.toUpperCase()}
-				</div>
-			</Link>
+		<tr className='flex justify-between border-b-[1px] py-[5px] px-[0.5rem] md:px-[2rem]'>
+			<td className='hover:font-semibold'>
+				<Link to={`/problems/${problem._id}`}>{problem.title}</Link>
+			</td>
+			<td className={`font-bold ${difficultyClass}`}>
+				{problem.difficulty.toUpperCase()}
+			</td>
 		</tr>
 	);
 }

@@ -1,10 +1,16 @@
 import { useNavigate, Link } from "react-router-dom";
-import Navbar from "../components/general-components/Navbar";
 
 function Home() {
 	const navigate = useNavigate();
 	const handleClick = () => {
-		navigate("/login");
+		const token = localStorage.getItem("authToken");
+		if (!token) {
+			navigate("/login");
+			return;
+		}
+
+		console.log("Already logged in");
+		navigate("/problems");
 	};
 	return (
 		<main className='flex flex-col items-center justify-center h-screen bg-[#17153B]'>

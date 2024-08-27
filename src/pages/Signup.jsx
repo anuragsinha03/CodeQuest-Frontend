@@ -1,19 +1,37 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { auth } from "./../auth/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 function Signup() {
 	const navigate = useNavigate();
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [error, setError] = useState("");
 
-	const handleLogin = e => {
+	const handleLogin = async e => {
 		e.preventDefault();
-		console.log("Name:", name);
-		console.log("Email:", email);
-		console.log("Password:", password);
+		setError("");
+
+		// console.log("Name:", name);
+		// console.log("Email:", email);
+		// console.log("Password:", password);
 		// API call to login
-		navigate("/login");
+		try {
+			const userCredential = await createUserWithEmailAndPassword(
+				auth,
+				email,
+				password
+			);
+
+			await updateProfile(userCredential.user, { displayName: name });
+
+			navigate("/login");
+		} catch (error) {
+			setError(error.message);
+			console.error("Signup Error:", error.message);
+		}
 	};
 
 	return (
@@ -32,6 +50,7 @@ function Signup() {
 								value={name}
 								onChange={e => setName(e.target.value)}
 								placeholder='John Doe'
+								required
 							/>
 						</div>
 
@@ -43,6 +62,7 @@ function Signup() {
 								value={email}
 								onChange={e => setEmail(e.target.value)}
 								placeholder='example@xyz.com'
+								required
 							/>
 						</div>
 
@@ -54,6 +74,7 @@ function Signup() {
 								value={password}
 								onChange={e => setPassword(e.target.value)}
 								placeholder='**********'
+								required
 							/>
 							<Link
 								className='text-sm font-bold text-left'
@@ -62,6 +83,12 @@ function Signup() {
 							</Link>
 						</div>
 					</div>
+
+					{error && (
+						<p className='text-red-500 text-sm text-center'>
+							{error}
+						</p>
+					)}
 
 					<button
 						onClick={handleLogin}

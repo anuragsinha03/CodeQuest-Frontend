@@ -1,17 +1,36 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { auth } from "./../auth/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
 	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [error, setError] = useState("");
 
-	const handleLogin = e => {
+	const handleLogin = async e => {
 		e.preventDefault();
-		console.log("Email:", email);
-		console.log("Password:", password);
+		// console.log("Email:", email);
+		// console.log("Password:", password);
+
 		// API call to login
-		navigate("/problems");
+		try {
+			const userCredential = await signInWithEmailAndPassword(
+				auth,
+				email,
+				password
+			);
+
+			const token = userCredential.user.accessToken;
+			localStorage.setItem("authToken", token);
+			// console.log(token);
+
+			navigate("/problems");
+		} catch (error) {
+			console.error("Error logging you in: ", error.code, error.message);
+			setError(error.message);
+		}
 	};
 
 	return (
@@ -49,6 +68,12 @@ function Login() {
 							</Link>
 						</div>
 					</div>
+
+					{error && (
+						<p className='text-red-500 text-sm text-center'>
+							{error}
+						</p>
+					)}
 
 					<button
 						onClick={handleLogin}
