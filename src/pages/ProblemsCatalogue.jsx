@@ -25,7 +25,7 @@ function ProblemsCatalogue() {
 	return (
 		<main className='bg-[#17153B]'>
 			<Navbar />
-			<section className='flex flex-col gap-[1rem] px-[2rem] text-white h-screen bg-[#17153B]'>
+			<section className='flex flex-col gap-[1rem] px-[2rem] text-white md:h-[90vh] bg-[#17153B]'>
 				<div className='text-xl font-semibold'>All Problems</div>
 				<table className='flex flex-col gap-2'>
 					<tr className='border-b-[1px] bg-[#433D8B] flex justify-between font-bold'>

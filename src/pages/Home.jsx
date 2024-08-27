@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/general-components/Navbar";
 
 function Home() {
@@ -8,13 +8,15 @@ function Home() {
 	};
 	return (
 		<main className='flex flex-col items-center justify-center h-screen bg-[#17153B]'>
-			<Navbar />
+			<nav className='flex items-center justify-center font-bold px-[4rem] text-white text-2xl h-[10vh] w-[98vw]'>
+				<Link to='/'>CodeQuest</Link>
+			</nav>
 			<section className='text-white'>
 				<div className='flex flex-col items-center gap-[1rem] font-light text-xl text-center'>
 					Elevate Your Coding Skills with CodeQuest
 					<button
 						onClick={handleClick}
-						className='bg-[#C8ACD6] h-[3rem] w-[10rem] rounded-lg'>
+						className='bg-[#C8ACD6] font-semibold text-black/80 hover:text-black h-[3rem] w-[15rem] rounded-lg'>
 						Start Coding!
 					</button>
 				</div>
