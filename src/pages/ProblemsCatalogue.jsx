@@ -4,6 +4,9 @@ import Navbar from "../components/general-components/Navbar";
 import axios from "axios";
 import ProblemCard from "../components/problem-components/ProblemCard";
 
+const CODEQUEST_PROBLEM_SERVICE_URL = import.meta.env
+	.VITE_CODEQUEST_PROBLEM_SERVICE_URL;
+
 function ProblemsCatalogue({ currentUser }) {
 	const [problems, setProblems] = useState([]);
 	const userName = currentUser.displayName.split(" ")[0];
@@ -12,9 +15,8 @@ function ProblemsCatalogue({ currentUser }) {
 		async function fetchAllProblems() {
 			try {
 				const response = await axios.get(
-					"http://localhost:3001/api/v1/problems"
+					`${CODEQUEST_PROBLEM_SERVICE_URL}/api/v1/problems`
 				);
-
 				setProblems(response.data.data);
 			} catch (err) {
 				console.error("Error fetching all problems:", err);

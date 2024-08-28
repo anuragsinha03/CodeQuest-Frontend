@@ -10,7 +10,14 @@ import Themes from "./../constants/Themes";
 import "./../imports/AceBuildImports";
 import { useParams, useNavigate } from "react-router-dom";
 
-const socketServerURL = "http://localhost:3005";
+const CODEQUEST_WEBSOCKET_SERVICE_URL = import.meta.env
+	.VITE_CODEQUEST_WEBSOCKET_SERVICE_URL;
+
+const CODEQUEST_SUBMISSION_SERVICE_URL = import.meta.env
+	.VITE_CODEQUEST_SUBMISSION_SERVICE_URL;
+
+const CODEQUEST_PROBLEM_SERVICE_URL = import.meta.env
+	.VITE_CODEQUEST_PROBLEM_SERVICE_URL;
 
 function Problem() {
 	const navigate = useNavigate();
@@ -30,7 +37,9 @@ function Problem() {
 	const userId = "1"; // Replace with actual user ID as needed
 
 	useEffect(() => {
-		const newSocket = io(socketServerURL, { transports: ["websocket"] });
+		const newSocket = io(CODEQUEST_WEBSOCKET_SERVICE_URL, {
+			transports: ["websocket"],
+		});
 
 		newSocket.on("connect", () => {
 			// console.log("Connected to the server with id: ", newSocket.id);
@@ -58,7 +67,7 @@ function Problem() {
 		async function fetchProblem() {
 			try {
 				const response = await axios.get(
-					`http://localhost:3001/api/v1/problems/${problemId}`
+					`${CODEQUEST_PROBLEM_SERVICE_URL}/api/v1/problems/${problemId}`
 				);
 
 				setCode(response.data.data.codeStubs[0].userSnippet);
@@ -91,9 +100,10 @@ function Problem() {
 				navigate("/login");
 			}
 
+			console.log(CODEQUEST_SUBMISSION_SERVICE_URL);
 			// eslint-disable-next-line no-unused-vars
 			const response = await axios.post(
-				"http://localhost:3000/api/v1/submissions",
+				`${CODEQUEST_SUBMISSION_SERVICE_URL}/api/v1/submissions`,
 				{
 					code,
 					language,
