@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "./../auth/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 function Login() {
 	const navigate = useNavigate();
@@ -11,10 +11,7 @@ function Login() {
 
 	const handleLogin = async e => {
 		e.preventDefault();
-		// console.log("Email:", email);
-		// console.log("Password:", password);
 
-		// API call to login
 		try {
 			const userCredential = await signInWithEmailAndPassword(
 				auth,
@@ -22,11 +19,14 @@ function Login() {
 				password
 			);
 
-			const token = userCredential.user.accessToken;
-			localStorage.setItem("authToken", token);
-			// console.log(token);
-
-			navigate("/problems");
+			if (userCredential.user.emailVerified) {
+				const token = userCredential.user.accessToken;
+				localStorage.setItem("authToken", token);
+				navigate("/problems");
+			} else {
+				await signOut(auth);
+				setError("Please verify your email before logging in.");
+			}
 		} catch (error) {
 			console.error("Error logging you in: ", error.code, error.message);
 			setError(error.message);

@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "./../auth/firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+	createUserWithEmailAndPassword,
+	sendEmailVerification,
+	signOut,
+	updateProfile,
+} from "firebase/auth";
+import { validatePassword } from "./../utils/ValidatePassword";
 
 function Signup() {
 	const navigate = useNavigate();
@@ -10,14 +16,17 @@ function Signup() {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 
-	const handleLogin = async e => {
+	const handleSignup = async e => {
 		e.preventDefault();
 		setError("");
 
-		// console.log("Name:", name);
-		// console.log("Email:", email);
-		// console.log("Password:", password);
-		// API call to login
+		// Validate the password
+		const passwordError = validatePassword(password);
+		if (passwordError) {
+			setError(passwordError);
+			return;
+		}
+
 		try {
 			const userCredential = await createUserWithEmailAndPassword(
 				auth,
@@ -27,7 +36,16 @@ function Signup() {
 
 			await updateProfile(userCredential.user, { displayName: name });
 
-			navigate("/login");
+			await sendEmailVerification(userCredential.user);
+
+			await signOut(auth);
+
+			navigate("/login", {
+				state: {
+					message:
+						"A verification email has been sent to your email address. Please verify your email before logging in.",
+				},
+			});
 		} catch (error) {
 			setError(error.message);
 			console.error("Signup Error:", error.message);
@@ -43,7 +61,7 @@ function Signup() {
 				<form className='flex flex-col items-center gap-[2rem] font-light text-xl text-center'>
 					<div className='flex flex-col gap-[0.5rem]'>
 						<div className='flex flex-col'>
-							<p className=' text-sm text-left'>Name</p>
+							<p className='text-sm text-left'>Name</p>
 							<input
 								className='p-[10px] rounded-lg bg-[#433D8B]'
 								type='text'
@@ -55,7 +73,7 @@ function Signup() {
 						</div>
 
 						<div className='flex flex-col'>
-							<p className=' text-sm text-left'>Email</p>
+							<p className='text-sm text-left'>Email</p>
 							<input
 								className='p-[10px] rounded-lg bg-[#433D8B]'
 								type='email'
@@ -67,7 +85,7 @@ function Signup() {
 						</div>
 
 						<div className='flex flex-col'>
-							<p className=' text-sm text-left'>Password</p>
+							<p className='text-sm text-left'>Password</p>
 							<input
 								className='p-[10px] rounded-lg bg-[#433D8B]'
 								type='password'
@@ -86,7 +104,7 @@ function Signup() {
 					)}
 
 					<button
-						onClick={handleLogin}
+						onClick={handleSignup}
 						className='bg-[#C8ACD6] text-black/80 hover:text-black font-semibold h-[3rem] w-[15rem] rounded-lg'>
 						Register
 					</button>
