@@ -7,6 +7,7 @@ import ProblemsCatalogue from "./pages/ProblemsCatalogue";
 import { AuthProvider } from "./auth/AuthContext";
 import PrivateRoute from "./auth/PrivateRoute";
 import PasswordReset from "./pages/PasswordReset";
+import NotFound from "./pages/NotFound";
 
 function App() {
 	return (
@@ -40,6 +41,11 @@ function App() {
 								<Problem></Problem>
 							</PrivateRoute>
 						}></Route>
+
+					<Route
+						path='*'
+						element={<NotFound />}
+					/>
 				</Routes>
 			</AuthProvider>
 		</>

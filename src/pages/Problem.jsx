@@ -76,6 +76,7 @@ function Problem() {
 				setTestCases(response.data.data.testCases);
 			} catch (error) {
 				console.error("Error fetching problem data:", error);
+				navigate("/404");
 			}
 		}
 
