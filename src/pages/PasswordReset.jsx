@@ -17,7 +17,7 @@ function PasswordReset() {
 			setError(null);
 			setTimeout(() => {
 				navigate("/login");
-			}, 2000);
+			}, 1000);
 		} catch (error) {
 			setMessage("");
 			setError("Failed to reset the password. Please try again.");

@@ -92,8 +92,8 @@ function Problem() {
 		}
 
 		try {
-			// console.log("Submitting code:", code);
-			// console.log("Using language:", language);
+			console.log("Submitting code:", code);
+			console.log("Using language:", language);
 
 			const token = localStorage.getItem("authToken");
 			if (!token) {
