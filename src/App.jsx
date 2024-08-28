@@ -6,6 +6,7 @@ import Problem from "./pages/Problem";
 import ProblemsCatalogue from "./pages/ProblemsCatalogue";
 import { AuthProvider } from "./auth/AuthContext";
 import PrivateRoute from "./auth/PrivateRoute";
+import PasswordReset from "./pages/PasswordReset";
 
 function App() {
 	return (
@@ -15,6 +16,10 @@ function App() {
 					<Route
 						path='/'
 						element={<Home />}></Route>
+					<Route
+						path='/passwordreset'
+						element={<PasswordReset />}
+					/>
 					<Route
 						path='/login'
 						element={<Login />}></Route>

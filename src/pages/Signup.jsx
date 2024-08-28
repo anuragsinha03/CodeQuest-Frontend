@@ -76,11 +76,6 @@ function Signup() {
 								placeholder='**********'
 								required
 							/>
-							<Link
-								className='text-sm font-bold text-left'
-								to='/login'>
-								Already registered? Login
-							</Link>
 						</div>
 					</div>
 
@@ -95,6 +90,12 @@ function Signup() {
 						className='bg-[#C8ACD6] text-black/80 hover:text-black font-semibold h-[3rem] w-[15rem] rounded-lg'>
 						Register
 					</button>
+
+					<Link
+						className='text-sm font-bold text-left'
+						to='/login'>
+						Back to Login
+					</Link>
 				</form>
 			</section>
 		</main>

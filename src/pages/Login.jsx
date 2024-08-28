@@ -63,8 +63,8 @@ function Login() {
 							/>
 							<Link
 								className='text-sm font-bold text-left'
-								to='/signup'>
-								Create a new account
+								to='/passwordreset'>
+								forgot your password?
 							</Link>
 						</div>
 					</div>
@@ -80,6 +80,12 @@ function Login() {
 						className=' bg-[#C8ACD6] text-black/90 hover:text-black font-semibold h-[3rem] w-[15rem] rounded-lg'>
 						Login
 					</button>
+
+					<Link
+						className='text-sm font-bold text-left'
+						to='/signup'>
+						Create a new account
+					</Link>
 				</form>
 			</section>
 		</main>
