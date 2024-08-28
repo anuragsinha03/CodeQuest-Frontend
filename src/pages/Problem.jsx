@@ -91,8 +91,8 @@ function Problem() {
 		}
 
 		try {
-			console.log("Submitting code:", code);
-			console.log("Using language:", language);
+			// console.log("Submitting code:", code);
+			// console.log("Using language:", language);
 
 			const token = localStorage.getItem("authToken");
 			if (!token) {
@@ -100,7 +100,6 @@ function Problem() {
 				navigate("/login");
 			}
 
-			console.log(CODEQUEST_SUBMISSION_SERVICE_URL);
 			// eslint-disable-next-line no-unused-vars
 			const response = await axios.post(
 				`${CODEQUEST_SUBMISSION_SERVICE_URL}/api/v1/submissions`,
